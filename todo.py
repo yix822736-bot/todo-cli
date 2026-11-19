@@ -8,20 +8,19 @@ def save_tasks(tasks):
     with open(FILE, "w", encoding="utf-8") as f:
         json.dump(tasks, f, ensure_ascii=False, indent=2)
 
-
 def load_tasks():
     if not os.path.exists(FILE):
         return []
     with open(FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
+#1添加
 def add_task(tasks):
     title = input("待办内容：")
     tasks.append({"title": title, "done": False})
     print("已添加")
 
-
+#2查看
 def show_tasks(tasks):
     if len(tasks) == 0:
         print("暂无待办")
@@ -33,25 +32,36 @@ def show_tasks(tasks):
             mark = " "
         print(f"{i + 1}. [{mark}] {t['title']}")
 
-
+#3完成
 def done_task(tasks):
     show_tasks(tasks)
-    n = int(input("要完成第几条："))
-    if n < 1 or n > len(tasks):
-        print("编号不存在")
+    idx = ask_index(tasks, "要完成第几条：")
+    if idx is None:
         return
-    tasks[n - 1]["done"] = True
+    tasks[idx]["done"] = True
     print("已标记完成")
 
-
+#4删除
 def delete_task(tasks):
     show_tasks(tasks)
-    n = int(input("要删除第几条："))
+    idx = ask_index(tasks, "要删除第几条：")
+    if idx is None:
+        return
+    removed = tasks.pop(idx)
+    print(f"已删除：{removed['title']}")
+
+#读编号
+def ask_index(tasks, prompt):
+    raw = input(prompt)
+    try:
+        n = int(raw)
+    except ValueError:
+        print("请输入数字编号")
+        return None
     if n < 1 or n > len(tasks):
         print("编号不存在")
-        return
-    removed = tasks.pop(n - 1)
-    print(f"已删除：{removed['title']}")
+        return None
+    return n - 1
 
 
 tasks = load_tasks()
@@ -73,3 +83,6 @@ while True:
         break
     else:
         print("没有这个选项")
+
+
+
